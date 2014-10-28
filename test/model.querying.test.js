@@ -1230,6 +1230,23 @@ describe('model: querying:', function(){
       });
     });
 
+    it('null matches null and undefined in arrays (gh-2411)', function(done){
+      var db = start()
+        , BlogPostB = db.model('BlogPostB', collection + random());
+
+      BlogPostB.create(
+          { title: 'A', author: null }
+        , { title: 'B' }, function (err, createdA, createdB) {
+        assert.ifError(err);
+        BlogPostB.find({author: {$in: [undefined]}}, function (err, found) {
+          db.close();
+          assert.ifError(err);
+          assert.equal(2, found.length);
+          done();
+        });
+      });
+    });
+
     it('a document whose arrays contain at least $all string values', function(done){
       var db = start()
         , BlogPostB = db.model('BlogPostB', collection);
